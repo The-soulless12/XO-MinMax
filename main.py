@@ -93,89 +93,73 @@ def demander_coordonnees(grille, n):
         except (ValueError, IndexError):
             print("Coordonnées invalides. Assurez-vous d'entrer deux chiffres entre 0 et 2 séparés par un espace.")
 
+def tour_jeu(grille, joueur, n, conseils, est_humain):
+    coup = meilleur_coup(grille, joueur)  # Choisir le meilleur coup
+    if coup is None:  # Aucun coup valide trouvé
+        print("Match nul !")
+        return True
+    
+    if joueur == 1:  # Tour du joueur X
+        if est_humain:
+            print("C'est à votre tour, cher joueur X:")
+            if conseils == "Y": 
+                print(f"💡 Conseil : Nous vous suggérons de jouer en ({coup[0]} {coup[1]}).")
+            i, j = demander_coordonnees(grille, n)
+        else:
+            print("C'est au tour du joueur X:")
+            i, j = coup
 
-def pc_contre_pc(grille):
-    while True:
-        coup = meilleur_coup(grille, 1)  # Choisir le meilleur coup pour X
-        if coup is None:  # Aucun coup valide trouvé
-            print("Match nul !")
-            break
-        print("C'est au tour du joueur X:")
-        i, j = coup
-        grille[i][j] = 1 
+        grille[i][j] = 1
         afficher_grille(grille)
-        if fonction_cout(grille) == 5:
+        if fonction_cout(grille) == 5:  # X a gagné
             print("Le joueur X a gagné!")
-            break
+            return True
+    else:  # Tour du joueur O
+        if est_humain:
+            print("C'est à votre tour, cher joueur O:")
+            if conseils == "Y":  
+                print(f"💡 Conseil : Nous vous suggérons de jouer en ({coup[0]} {coup[1]}).")
+            i, j = demander_coordonnees(grille, n) 
+        else:
+            print("C'est au tour du joueur O:") 
+            i, j = coup
 
-        coup = meilleur_coup(grille, 2)  # Choisir le meilleur coup pour O
-        if coup is None:  # Aucun coup valide trouvé
-            print("Match nul !")
-            break
-        print("C'est au tour du joueur O:")
-        i, j = coup
         grille[i][j] = 2
         afficher_grille(grille)
-        if fonction_cout(grille) == -5:
+        if fonction_cout(grille) == -5:  # O a gagné
             print("Le joueur O a gagné!")
+            return True
+
+    return False
+
+def pc_contre_pc(grille, n):
+    while True:
+        # Tour de X
+        if tour_jeu(grille, 1, n, conseils=None, est_humain=False):
+            break
+
+        # Tour de O
+        if tour_jeu(grille, 2, n, conseils=None, est_humain=False):
             break
 
 def humain_contre_pc(grille, conseils, n):
     while True:
-        coup = meilleur_coup(grille, 1)  # Choisir le meilleur coup pour X
-        if coup is None:  # Aucun coup valide trouvé
-            print("Match nul !")
-            break
-        print("C'est à votre tour, cher joueur X:")
-        i, j = coup
-        if conseils == "Y":  
-            print(f"💡 Conseil : Nous vous suggérons de jouer en ({i} {j}).")
-        i, j = demander_coordonnees(grille, n)
-        grille[i][j] = 1
-        afficher_grille(grille)
-        if fonction_cout(grille) == 5:
-            print("Le joueur X a gagné!")
+        # Tour de X (humain)
+        if tour_jeu(grille, 1, n, conseils, est_humain=True):
             break
 
-        coup = meilleur_coup(grille, 2)  # Choisir le meilleur coup pour O
-        if coup is None:  # Aucun coup valide trouvé
-            print("Match nul !")
-            break
-        print("C'est au tour du joueur O:")
-        i, j = coup
-        grille[i][j] = 2
-        afficher_grille(grille)
-        if fonction_cout(grille) == -5:
-            print("Le joueur O a gagné!")
+        # Tour de O (PC)
+        if tour_jeu(grille, 2, n, conseils, est_humain=False):
             break
 
 def pc_contre_humain(grille, conseils, n):
     while True:
-        coup = meilleur_coup(grille, 1)  # Choisir le meilleur coup pour X
-        if coup is None:  # Aucun coup valide trouvé
-            print("Match nul !")
-            break
-        print("C'est au tour du joueur X:")
-        i, j = coup
-        grille[i][j] = 1 
-        afficher_grille(grille)
-        if fonction_cout(grille) == 5:
-            print("Le joueur X a gagné!")
+        # Tour de X (PC)
+        if tour_jeu(grille, 1, n, conseils, est_humain=False):
             break
 
-        coup = meilleur_coup(grille, 2)  # Choisir le meilleur coup pour O
-        if coup is None:  # Aucun coup valide trouvé
-            print("Match nul !")
-            break
-        print("C'est à votre tour, cher joueur O:") 
-        i, j = coup
-        if conseils == "Y":  
-            print(f"💡 Conseil : Nous vous suggérons de jouer en ({i} {j}).")
-        i, j = demander_coordonnees(grille, n)
-        grille[i][j] = 2 
-        afficher_grille(grille)
-        if fonction_cout(grille) == -5:
-            print("Le joueur O a gagné!")
+        # Tour de O (humain)
+        if tour_jeu(grille, 2, n, conseils, est_humain=True):
             break
 
 def menu():
@@ -201,7 +185,7 @@ def main():
     while True:
         choix = menu()
         if choix == "1":
-            pc_contre_pc([[0 for _ in range(n)] for _ in range(n)])
+            pc_contre_pc([[0 for _ in range(n)] for _ in range(n)], n)
         elif choix == "2":
             conseils = activer_conseils()
             humain_contre_pc([[0 for _ in range(n)] for _ in range(n)], conseils, n)
