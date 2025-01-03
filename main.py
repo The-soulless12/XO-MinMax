@@ -16,7 +16,7 @@ def fonction_cout(grille):
         elif x == [2, 2, 2]:  # Le joueur O a gagné
             return -5
 
-    if all(cell != 0 for ligne in grille for cell in ligne):  # Grille pleine
+    if all(cell != 0 for ligne in grille for cell in ligne):
         return 0
 
     return 0 
@@ -42,7 +42,6 @@ def minmax(grille, profondeur, alpha, beta, joueur):
                     alpha = max(alpha, meilleur_score)
                     if beta <= alpha:
                         break  # Élagage Beta
-
         return meilleur_score
 
     # Si c'est au tour du joueur 'O' (minimiser le score)
@@ -59,7 +58,6 @@ def minmax(grille, profondeur, alpha, beta, joueur):
                     beta = min(beta, meilleur_score)
                     if beta <= alpha:
                         break  # Élagage Alpha
-
         return meilleur_score
 
 def meilleur_coup(grille, joueur):
@@ -134,11 +132,11 @@ def tour_jeu(grille, joueur, n, conseils, est_humain):
 
 def pc_contre_pc(grille, n):
     while True:
-        # Tour de X
+        # Tour de X (PC)
         if tour_jeu(grille, 1, n, conseils=None, est_humain=False):
             break
 
-        # Tour de O
+        # Tour de O (PC)
         if tour_jeu(grille, 2, n, conseils=None, est_humain=False):
             break
 
