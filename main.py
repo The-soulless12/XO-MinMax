@@ -79,11 +79,7 @@ def meilleur_coup(grille, joueur):
 
     return coup
 
-def main():
-    n = 3
-    grille = [[0 for _ in range(n)] for _ in range(n)]
-    afficher_grille(grille)
-    
+def pc_contre_pc(grille):
     while True:
         print("C'est au tour du joueur X:")
         coup = meilleur_coup(grille, 1)  # Choisir le meilleur coup pour X
@@ -108,6 +104,13 @@ def main():
         if fonction_cout(grille) == -5:
             print("Le joueur O a gagné!")
             break
+
+def main():
+    n = 3
+    grille = [[0 for _ in range(n)] for _ in range(n)]
+    afficher_grille(grille)
+    
+    pc_contre_pc(grille)
 
 if __name__ == "__main__":
     main()
