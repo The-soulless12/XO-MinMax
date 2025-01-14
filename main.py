@@ -1,9 +1,12 @@
+import random
+
 n = 3
 
 def afficher_grille(grille):
     emojis = {0: "⬜", 1: "❌", 2: "⭕"} 
     for ligne in grille:
         print(" ".join([emojis[cell] for cell in ligne]))
+    print()
 
 def fonction_cout(grille):
     # On récupère les lignes, colonnes et diagonales
@@ -93,7 +96,7 @@ def demander_coordonnees(grille):
         except (ValueError, IndexError):
             print("Coordonnées invalides. Assurez-vous d'entrer deux chiffres entre 0 et 2 séparés par un espace.")
 
-def tour_jeu(grille, joueur, conseils, est_humain):
+def tour_jeu(grille, joueur, conseils, hard, est_humain):
     coup = meilleur_coup(grille, joueur)  # Choisir le meilleur coup
     if coup is None:  # Aucun coup valide trouvé
         print("Match nul !")
@@ -107,12 +110,19 @@ def tour_jeu(grille, joueur, conseils, est_humain):
             i, j = demander_coordonnees(grille)
         else:
             print("C'est au tour du joueur X:")
-            i, j = coup
+            if hard == "N":
+                while True:
+                    i = random.randint(0, n - 1) 
+                    j = random.randint(0, n - 1)  
+                    if 0 <= i < n and 0 <= j < n and grille[i][j] == 0:
+                        break
+            elif hard == "Y":
+                i, j = coup
 
         grille[i][j] = 1
         afficher_grille(grille)
         if fonction_cout(grille) == 5:  # X a gagné
-            print("Le joueur X a gagné!")
+            print(f"{'Le PC a' if est_humain == False else 'Vous avez'} gagné (Joueur X) !")
             return True
     else:  # Tour du joueur O
         if est_humain:
@@ -122,12 +132,19 @@ def tour_jeu(grille, joueur, conseils, est_humain):
             i, j = demander_coordonnees(grille) 
         else:
             print("C'est au tour du joueur O:") 
-            i, j = coup
+            if hard == "N":
+                while True:
+                    i = random.randint(0, n - 1) 
+                    j = random.randint(0, n - 1)  
+                    if 0 <= i < n and 0 <= j < n and grille[i][j] == 0:
+                        break
+            elif hard == "Y":
+                i, j = coup
 
         grille[i][j] = 2
         afficher_grille(grille)
         if fonction_cout(grille) == -5:  # O a gagné
-            print("Le joueur O a gagné!")
+            print(f"{'Le PC a' if est_humain == False else 'Vous avez'} gagné (Joueur O) !")
             return True
 
     return False
@@ -135,31 +152,31 @@ def tour_jeu(grille, joueur, conseils, est_humain):
 def pc_contre_pc(grille):
     while True:
         # Tour de X (PC)
-        if tour_jeu(grille, 1, conseils=None, est_humain=False):
+        if tour_jeu(grille, 1, conseils=None, hard="Y", est_humain=False):
             break
 
         # Tour de O (PC)
-        if tour_jeu(grille, 2, conseils=None, est_humain=False):
+        if tour_jeu(grille, 2, conseils=None, hard="Y", est_humain=False):
             break
 
-def humain_contre_pc(grille, conseils):
+def humain_contre_pc(grille, conseils, hard):
     while True:
         # Tour de X (humain)
-        if tour_jeu(grille, 1, conseils, est_humain=True):
+        if tour_jeu(grille, 1, conseils, hard, est_humain=True):
             break
 
         # Tour de O (PC)
-        if tour_jeu(grille, 2, conseils, est_humain=False):
+        if tour_jeu(grille, 2, conseils, hard, est_humain=False):
             break
 
-def pc_contre_humain(grille, conseils):
+def pc_contre_humain(grille, conseils, hard):
     while True:
         # Tour de X (PC)
-        if tour_jeu(grille, 1, conseils, est_humain=False):
+        if tour_jeu(grille, 1, conseils, hard, est_humain=False):
             break
 
         # Tour de O (humain)
-        if tour_jeu(grille, 2, conseils, est_humain=True):
+        if tour_jeu(grille, 2, conseils, hard, est_humain=True):
             break
 
 def menu():
@@ -179,6 +196,14 @@ def activer_conseils():
             else:
                 print("Entrée invalide. Veuillez répondre par 'Y' ou 'N'.")
 
+def activer_hard():
+        while True:
+            choix_conseils = input("⚙️  Voulez-vous activer le mode hard ? (Y/N) : ").strip().upper()
+            if choix_conseils in {"Y", "N"}:
+                return choix_conseils
+            else:
+                print("Entrée invalide. Veuillez répondre par 'Y' ou 'N'.")
+
 def main():
     while True:
         choix = menu()
@@ -186,10 +211,14 @@ def main():
             pc_contre_pc([[0 for _ in range(n)] for _ in range(n)])
         elif choix == "2":
             conseils = activer_conseils()
-            humain_contre_pc([[0 for _ in range(n)] for _ in range(n)], conseils)
+            hard = activer_hard()
+            print("----------------------------")
+            humain_contre_pc([[0 for _ in range(n)] for _ in range(n)], conseils, hard)
         elif choix == "3":
             conseils = activer_conseils()
-            pc_contre_humain([[0 for _ in range(n)] for _ in range(n)], conseils)
+            hard = activer_hard()
+            print("----------------------------")
+            pc_contre_humain([[0 for _ in range(n)] for _ in range(n)], conseils, hard)
         elif choix == "4":
             print("Merci d'avoir joué. À bientôt !")
             break
